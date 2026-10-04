@@ -1,13 +1,21 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c99
+CFLAGS = -Wall -Wextra -std=c11
 
-all: test_bits test_status
+OBJS = bits.o status.o
 
-test_bits: bits.c test_bits.c bits.h 
-	$(CC) $(CFLAGS) bits.c test_bits.c -o test_bits
+all: $(OBJS)
 
-test_status: bits.c status.c test_status.c bits.h status.h 
-	$(CC) $(CFLAGS) bits.c status.c test_status.c -o test_status
+bits.o: bits.c bits.h 
+	$(CC) $(CFLAGS) -c bits.c -o bits.o
+
+status.o: status.c bits.h status.h 
+	$(CC) $(CFLAGS) -c status.c -o status.o
+
+tests/test_bits: tests/test_bits.c $(OBJS)
+	$(CC) $(CFLAGS) -I. tests/test_bits.c $(OBJS) -o tests/test_bits
+
+test: tests/test_bits
+	./tests/test_bits
 
 clean: 
-	rm -f test_bits test_status
+	rm -f $(OBJS) tests/test_bits
